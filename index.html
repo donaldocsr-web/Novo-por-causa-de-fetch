@@ -300,4 +300,306 @@ document.getElementById('btnEnviar').onclick = async function(e){
 </script>
 
 </body>
-                             </html>
+</html><!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>AllGigabaytes</title>
+
+<style>
+/* RESET & BASE */
+body{margin:0;font-family:Arial,sans-serif;background:#f5f5f5;color:#000;text-align:center}
+a{text-decoration:none;color:inherit}
+.container{max-width:620px;margin:20px auto 40px;padding:0 10px}
+
+/* EQUALIZER */
+.equalizer{display:flex;justify-content:center;gap:8px;margin:12px 0 22px}
+.equalizer span{display:block;width:7px;height:40px;background:linear-gradient(to top,#00f0ff,#007bff);border-radius:3px;animation:pulse 1s ease-in-out infinite}
+.equalizer span:nth-child(1){animation-delay:0s}
+.equalizer span:nth-child(2){animation-delay:0.1s}
+.equalizer span:nth-child(3){animation-delay:0.2s}
+.equalizer span:nth-child(4){animation-delay:0.3s}
+.equalizer span:nth-child(5){animation-delay:0.4s}
+.equalizer span:nth-child(6){animation-delay:0.5s}
+.equalizer span:nth-child(7){animation-delay:0.6s}
+.equalizer span:nth-child(8){animation-delay:0.7s}
+@keyframes pulse{0%,100%{transform:scaleY(0.4)}50%{transform:scaleY(1)}}
+
+/* BOTÕES DE OPERADORA */
+.operadoras{display:flex;flex-wrap:wrap;justify-content:center;gap:12px;margin-bottom:20px}
+.btn-operadora{flex:1 1 42%;max-width:160px;padding:14px 0;font-size:17px;font-weight:700;color:#fff;border:none;border-radius:10px;cursor:pointer;box-shadow:0 4px 7px rgba(0,0,0,.2)}
+.vodacom{background:#e60000}
+.movitel{background:#ff8c00}
+.mcel{background:#007bff}
+.streaming{background:#111}
+.ilimitados{background:#e60000}
+
+/* VOLTAR */
+#voltarOperadoraContainer{display:none;margin-bottom:10px}
+.btn-voltar-operadora{display:inline-flex;align-items:center;gap:8px;background:#198754;color:#fff;font-weight:700;padding:14px 22px;border:none;border-radius:18px;cursor:pointer;box-shadow:0 4px 8px rgba(0,0,0,.3);font-size:16px}
+.btn-voltar-operadora:hover{background:#0f5132}
+
+/* GRID PACOTES */
+.pacotes{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin-top:10px}
+.cartao-pacote{background:#fff;border-radius:14px;padding:16px 14px 22px;box-shadow:0 3px 11px rgba(0,0,0,.17);display:flex;flex-direction:column;justify-content:space-between;min-height:135px}
+.cartao-pacote h4{margin:8px 0 10px;font-weight:800;font-size:16px;color:#000}
+.cartao-pacote p{font-size:14px;color:#555;margin:0 0 14px}
+.cartao-pacote .detalhe{color:#e60000;font-weight:600}
+.cartao-pacote button{margin-top:auto;color:#fff;border:none;padding:9px 0;border-radius:10px;cursor:pointer;font-weight:800;font-size:15px}
+.cartao-pacote.vodacom button{background:#e60000}
+.cartao-pacote.movitel button{background:#ff8c00}
+.cartao-pacote.mcel button{background:#007bff}
+.cartao-pacote.streaming button{background:#111}
+
+/* STREAMING LOGOS */
+.logo-streaming{width:70px;height:auto;margin:0 auto 8px;user-select:none}
+
+/* MENU ILIMITADOS */
+.ilimitados-menu{display:flex;flex-direction:column;align-items:center;gap:12px;width:100%}
+.ilimitados-menu .btn-ilimitados{width:85%;padding:14px 0;border:none;border-radius:12px;color:#fff;font-weight:800;cursor:pointer;box-shadow:0 4px 7px rgba(0,0,0,.2);font-size:16px}
+
+/* MODAL FORMULÁRIO */
+.form-modal{position:fixed;inset:0;background:rgba(0,0,0,.65);display:none;justify-content:center;align-items:center;z-index:1100}
+.form-content{background:#fff;padding:25px 25px 20px;border-radius:20px;width:90%;max-width:400px;box-shadow:0 5px 18px rgba(0,0,0,.28);text-align:left}
+.form-content h3{margin:0 0 18px;font-weight:800;color:#222;font-size:22px;text-align:center}
+.form-content p{font-size:15px;font-weight:600;margin:6px 0 8px;color:#222}
+.form-content input,.form-content select{width:100%;padding:11px 13px;margin-top:10px;font-size:16px;border-radius:9px;border:1.8px solid #bbb;box-sizing:border-box}
+.form-content input:focus,.form-content select:focus{outline:none;border-color:#007bff}
+.form-buttons{margin-top:26px;display:flex;flex-direction:column;gap:14px}
+.btn-ok{background:#007bff;color:#fff;font-weight:700;font-size:17px;border:none;padding:14px 0;border-radius:12px;cursor:pointer}
+.btn-ok:hover{background:#0056b3}
+.btn-voltar{background:#198754;color:#fff;font-weight:700;font-size:17px;border:none;padding:14px 0;border-radius:12px;cursor:pointer}
+.btn-voltar:hover{background:#0f5132}
+.processando-msg{margin-top:12px;font-style:italic;color:#555;text-align:center;font-weight:600}
+
+/* SPINNER */
+#spinnerOverlay{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;z-index:1200}
+.loader{width:64px;height:64px;border:6px solid #fff;border-top-color:transparent;border-radius:50%;animation:spin 0.9s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* WHATSAPP */
+.botao-suporte{position:fixed;bottom:20px;right:20px;background:#25D366;color:#fff;padding:14px 24px;border-radius:30px;font-size:14px;font-weight:700;display:flex;align-items:center;gap:8px;box-shadow:0 4px 6px rgba(0,0,0,.3)}
+.botao-suporte:hover{background:#1ebe57}
+</style>
+</head>
+
+<body>
+
+<div class="container" id="conteudo">
+  <p style="color:#007bff;font-weight:bold;font-size:16px;">Melhor fornecedora de internet da atualidade!</p>
+
+  <div class="equalizer">
+    <span></span><span></span><span></span><span></span>
+    <span></span><span></span><span></span><span></span>
+  </div>
+
+  <h2>Selecione a Operadora</h2>
+
+  <div class="operadoras" id="listaOperadoras">
+    <button class="btn-operadora vodacom" onclick="clicarOperadora('vodacom')">Vodacom</button>
+    <button class="btn-operadora movitel" onclick="clicarOperadora('movitel')">Movitel</button>
+    <button class="btn-operadora mcel" onclick="clicarOperadora('mcel')">Mcel</button>
+    <button class="btn-operadora streaming" onclick="clicarOperadora('streaming')">Netflix/Spotify</button>
+    <button class="btn-operadora ilimitados" onclick="clicarOperadora('ilimitados')">Pacotes Ilimitados</button>
+  </div>
+
+  <div id="voltarOperadoraContainer">
+    <button class="btn-voltar-operadora" onclick="voltarOperadoras()">← Voltar</button>
+  </div>
+
+  <div class="pacotes" id="pacotes"></div>
+</div>
+
+<!-- MODAL -->
+<div class="form-modal" id="formModal">
+  <div class="form-content">
+    <h3>Finalizar Pedido</h3>
+    <p>Pacote Selecionado: <strong id="pacoteSelecionadoTexto"></strong></p>
+    <input type="text" id="nome" placeholder="Nome do comprador" required />
+    <select id="metodoPagamento" required>
+      <option value="" disabled selected>Escolha o método de pagamento</option>
+      <option value="mpesa">M-Pesa</option>
+    </select>
+    <input type="text" id="numero" placeholder="Número a receber o pacote" required />
+    <input type="text" id="telefone" placeholder="Seu número M-Pesa" required />
+    <div class="processando-msg" id="processandoMsg" style="display:none;">Processando pagamento...</div>
+    <div class="processando-msg" id="statusPagamento" style="display:none;"></div>
+    <div class="form-buttons">
+      <button type="button" class="btn-ok" id="btnEnviar">Enviar Pedido</button>
+      <button type="button" class="btn-voltar" id="btnVoltarForm">Voltar</button>
+    </div>
+  </div>
+</div>
+
+<div id="spinnerOverlay"><div class="loader"></div></div>
+
+<a href="https://wa.me/258871990314" class="botao-suporte" target="_blank">Suporte via Whatsapp 💬</a>
+
+<script>
+/* ==================== DADOS DOS PACOTES ==================== */
+const pacotesData={
+  vodacom:['10GB - 110MT','20GB - 220MT','30GB - 330MT','40GB - 440MT','50GB - 550MT','60GB - 660MT','70GB - 770MT','80GB - 880MT','90GB - 990MT','100GB - 1000MT','120GB - 1200MT'],
+  movitel:['10GB - 115MT','20GB - 225MT','30GB - 325MT','40GB - 444MT','50GB - 555MT','60GB - 665MT','70GB - 775MT','80GB - 885MT','90GB - 995MT','100GB - 1005MT','120GB - 1225MT'],
+  mcel:['10GB - 110MT','20GB - 220MT','30GB - 330MT','40GB - 440MT','50GB - 550MT','60GB - 660MT','70GB - 770MT','80GB - 880MT','90GB - 990MT','100GB - 1000MT','120GB - 1200MT'],
+  streaming:[
+    {name:'Netflix - 1 Mês - 240MT',logo:'https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg'},
+    {name:'Spotify - 1 Mês - 160MT',logo:'https://upload.wikimedia.org/wikipedia/commons/2/26/Spotify_logo_with_text.svg'}
+  ]
+};
+
+const ilimitadosData={
+  vodacom:['• Chamadas + SMS ilimitados + 20GB - 380MT','• Chamadas + SMS ilimitados + 40GB - 640MT'],
+  movitel:['• Chamadas + SMS ilimitados + 20GB - 380MT','• Chamadas + SMS ilimitados + 40GB - 640MT'],
+  mcel:['• Chamadas + SMS ilimitados + 20GB - 350MT','• Chamadas + SMS ilimitados + 40GB - 600MT']
+};
+
+const cores={vodacom:'#e60000',movitel:'#ff8c00',mcel:'#007bff',streaming:'#111'};
+
+/* ==================== FUNÇÕES DE INTERFACE ==================== */
+let pacoteSelecionado='';
+
+function clicarOperadora(tipo){
+  document.getElementById('listaOperadoras').style.display='none';
+  document.getElementById('voltarOperadoraContainer').style.display='block';
+  const pacotesDiv=document.getElementById('pacotes');
+  pacotesDiv.innerHTML='';
+
+  if(tipo==='streaming'){
+    pacotesData.streaming.forEach(p=>{
+      const card=document.createElement('div');
+      card.className='cartao-pacote streaming';
+      card.innerHTML=`<img src="${p.logo}" class="logo-streaming"/><h4>${p.name}</h4><p>Válido por 30 dias</p>`;
+      const btn=document.createElement('button');
+      btn.textContent='Comprar';
+      btn.style.backgroundColor=cores.streaming;
+      btn.onclick=()=>abrirFormulario(p.name,true);
+      card.appendChild(btn);
+      pacotesDiv.appendChild(card);
+    });
+  } else if(tipo==='ilimitados'){
+    const wrap=document.createElement('div');wrap.className='ilimitados-menu';
+    ['vodacom','movitel','mcel'].forEach(op=>{
+      const b=document.createElement('button');
+      b.className='btn-ilimitados';
+      b.style.backgroundColor=cores[op];
+      b.textContent='Ilimitados ' + op.charAt(0).toUpperCase()+op.slice(1);
+      b.onclick=()=>mostrarIlimitados(op);
+      wrap.appendChild(b);
+    });
+    pacotesDiv.appendChild(wrap);
+  } else {
+    pacotesData[tipo].forEach(p=>{
+      const card=document.createElement('div');
+      card.className='cartao-pacote '+tipo;
+      card.innerHTML=`<h4>${p}</h4><p>Válido por 30 dias</p>`;
+      const btn=document.createElement('button');
+      btn.textContent='Comprar agora';
+      btn.style.backgroundColor=cores[tipo];
+      btn.onclick=()=>abrirFormulario(p,false);
+      card.appendChild(btn);
+      pacotesDiv.appendChild(card);
+    });
+  }
+}
+
+function mostrarIlimitados(op){
+  const pacotesDiv=document.getElementById('pacotes');
+  pacotesDiv.innerHTML='';
+  ilimitadosData[op].forEach(p=>{
+    const card=document.createElement('div');
+    card.className='cartao-pacote '+op;
+    card.innerHTML=`<h4><span class="detalhe">${p.replace(/ - \d+MT$/,'')}</span> - ${p.match(/\d+MT$/)[0]}</h4><p>Válido por 30 dias</p>`;
+    const btn=document.createElement('button');
+    btn.textContent='Comprar';
+    btn.style.backgroundColor=cores[op];
+    btn.onclick=()=>abrirFormulario(p,false);
+    card.appendChild(btn);
+    pacotesDiv.appendChild(card);
+  });
+}
+
+function voltarOperadoras(){
+  document.getElementById('listaOperadoras').style.display='flex';
+  document.getElementById('voltarOperadoraContainer').style.display='none';
+  document.getElementById('pacotes').innerHTML='';
+}
+
+/* ==================== FORMULÁRIO ==================== */
+function abrirFormulario(pacote,isEmail){
+  pacoteSelecionado=pacote;
+  document.getElementById('pacoteSelecionadoTexto').textContent=pacote;
+  const inputNumero=document.getElementById('numero');
+  inputNumero.type=isEmail?'email':'text';
+  inputNumero.placeholder=isEmail?'E-mail a receber o pacote':'Número a receber o pacote';
+  document.getElementById('statusPagamento').style.display='none';
+  document.getElementById('formModal').style.display='flex';
+}
+document.getElementById('btnVoltarForm').onclick=()=>{document.getElementById('formModal').style.display='none'};
+
+/* ==================== PAGAMENTO COM PROXY CORS ==================== */
+document.getElementById('btnEnviar').onclick = async function(e){
+  e.preventDefault();
+
+  const telefone=document.getElementById('telefone').value.trim();
+  const matchPreco=(pacoteSelecionado.match(/(\d+)\s*MT/g)||[]);
+  const valor=matchPreco[matchPreco.length-1]?.replace(/\D/g,'')||'0';
+
+  if(!telefone || !valor){
+    alert('❌ Por favor, preencha todos os campos');
+    return;
+  }
+
+  document.getElementById('spinnerOverlay').style.display='flex';
+  document.getElementById('processandoMsg').style.display='block';
+  const statusEl = document.getElementById('statusPagamento');
+  statusEl.style.display='none';
+
+  try{
+    // SOLUÇÃO 1: Usando proxy CORS público
+    const proxyUrl = 'https://corsproxy.io/?';
+    const targetUrl = 'https://eticketsmz.site/payment/e-tickets-pay/payment';
+    
+    const res = await fetch(proxyUrl + encodeURIComponent(targetUrl), {
+      method: "POST",
+      headers: { 
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        customer_msisdn: "258"+telefone,
+        amount: String(valor),
+        ticket_id: "DARIO"
+      })
+    });
+
+    const data = await res.json();
+    console.log("Resposta:", data);
+
+    if(res.ok){
+      statusEl.style.display='block';
+      statusEl.style.color='#198754';
+      statusEl.textContent = "✅ Pagamento iniciado! Confirme no seu telefone";
+      
+      // Limpar formulário após 3 segundos
+      setTimeout(()=>{
+        document.getElementById('formModal').style.display='none';
+        statusEl.style.display='none';
+      }, 3000);
+    } else {
+      throw new Error(data.message || 'Erro no pagamento');
+    }
+
+  }catch(err){
+    console.error(err);
+    statusEl.style.display='block';
+    statusEl.style.color='#dc3545';
+    statusEl.textContent = "❌ Erro: " + err.message;
+  }finally{
+    document.getElementById('spinnerOverlay').style.display='none';
+    document.getElementById('processandoMsg').style.display='none';
+  }
+};
+</script>
+
+</body>
+</html>
